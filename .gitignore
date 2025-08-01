@@ -1,0 +1,18 @@
+develop_functions/
+
+.venv/
+
+.claude/
+
+service-account-key.json
+
+uv.lock
+
+.python-version
+
+pyproject.toml
+
+_adding_event_table
+
+# Hide all log files
+*_logs.sql
