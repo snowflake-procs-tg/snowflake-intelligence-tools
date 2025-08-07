@@ -74,11 +74,12 @@ EXECUTE AS OWNER
 AS $$
 BEGIN
     -- Send email directly using Snowflake's notification system
-    CALL SNOWFLAKE.NOTIFICATION.SEND_EMAIL(
+    CALL SYSTEM$SEND_EMAIL(
         'SNOWFLAKE_INTELLIGENCE_EMAIL',
         :recipient_email,
         :subject,
-        :body
+        :body,
+        'text/html'
     );
     
     -- Return success message
