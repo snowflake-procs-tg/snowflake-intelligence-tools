@@ -1,184 +1,139 @@
-# Snowflake Intelligence Tools - Demonstration Examples
+# Snowflake Tools Collection
 
-A collection of demonstration tools showcasing how to extend Snowflake Intelligence with external service integrations. These examples illustrate patterns for communication and data export capabilities.
+A collection of tools and utilities for extending Snowflake's capabilities with external integrations and automation features. These tools are designed to work with Snowflake Intelligence and general Snowflake deployments.
 
-**Note**: This code is for demonstration purposes only and should be adapted for your specific use cases.
+**Note**: These examples are provided for reference and should be adapted for your specific use cases and security requirements.
 
 ## 📋 Table of Contents
 
 - [Overview](#overview)
-- [Email Tools](#email-tools)
-  - [Email Sender](#email-sender)
-- [Google Docs Integration](#google-docs-integration)
-  - [Docs Export](#docs-export)
-- [Google Sheets Integration](#google-sheets-integration)
-  - [Sheets Export](#sheets-export)
+- [Available Tools](#available-tools)
+  - [Snowflake Intelligence Setup](#snowflake-intelligence-setup)
+  - [Email Tools](#email-tools)
+  - [Google Workspace](#google-workspace)
+  - [GitHub Integration](#github-integration)
+  - [Database Management](#database-management)
 - [Quick Start](#quick-start)
 - [Prerequisites](#prerequisites)
-- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
 
 ## 🎯 Overview
 
-This repository contains Snowflake stored procedures that extend Snowflake Intelligence with:
+This repository provides Snowflake stored procedures and utilities for:
 
-- **Email Notifications**: Send emails directly from Snowflake using native notification integrations
-- **Google Docs Export**: Convert markdown content to formatted Google Docs
-- **Google Sheets Export**: Export JSON data to formatted Google Sheets with timestamped tabs
+- **Snowflake Intelligence Extensions**: Custom tools for Snowflake Intelligence workflows
+- **External Integrations**: Connect Snowflake with external services (Email, Google, GitHub)
+- **Data Export**: Export data to various formats and platforms
+- **Code Access**: Browse and retrieve code from GitHub repositories
+- **Database Operations**: Manage DDL and DML operations systematically
 
-## 📧 Email Tools
+## Available Tools
 
-### Email Sender
-**File**: `email/email_sender.sql`
+### 🤖 Snowflake Intelligence Setup
+**Directory**: `snowflake_intelligence/`
 
-Send emails directly from Snowflake Intelligence using Snowflake's native notification integration.
+Foundation setup for Snowflake Intelligence custom tools.
 
-**Features**:
-- Direct email sending with immediate response
+- **setup.sql**: Creates the SNOWFLAKE_INTELLIGENCE database and TOOLS schema
+- Establishes the namespace for all custom procedures
+- Required for deploying any of the tools in this repository
+
+### 📧 Email Tools
+**Directory**: `email/`
+
+Send emails directly from Snowflake using native notification integration.
+
+- **email_sender.sql**: Send emails with subject and body content
 - Pre-approved recipient validation
-- Plain text email support
-- JSON response with success/failure details
+- JSON response format
 
-**Usage**:
+### 📄 Google Workspace
+**Directory**: `google/`
+
+Integration with Google Docs and Sheets for data export and reporting.
+
+#### Google Docs
+- **docs_export.sql**: Convert markdown to formatted Google Docs
+- Support for headers, lists, and text formatting
+
+#### Google Sheets  
+- **sheets_export.sql**: Export JSON data to Google Sheets
+- Automatic formatting and timestamped tabs
+- Dynamic column detection
+
+### 🐙 GitHub Integration
+**Directory**: `github/`
+
+Access GitHub repositories directly from Snowflake for code research and imports.
+
+- **github_directory_lister.sql**: Browse repository file structure
+- **github_file_extractor.sql**: Retrieve file contents
+- **github_integration_setup.sql**: Configure GitHub API access
+- Support for public and private repositories
+
+Example:
 ```sql
-CALL SNOWFLAKE_INTELLIGENCE.TOOLS.SEND_EMAIL(
-    'recipient@example.com',
-    'Subject Line',
-    'Email body content'
-);
+-- List repository contents
+CALL GITHUB_DIRECTORY_LISTER('microsoft', 'vscode', '', 'main');
+
+-- Get a specific file
+CALL GITHUB_FILE_EXTRACTOR('dbt-labs', 'jaffle_shop', 'models/staging/stg_orders.sql', 'main');
 ```
 
-## 📄 Google Docs Integration
+### 🗄️ Database Management
+**Directory**: `snowflake/`
 
-### Docs Export
-**File**: `google/docs/docs_export.sql`
+Utilities for database operations and management.
 
-Export markdown-formatted content from Snowflake Intelligence to Google Docs with automatic formatting.
-
-**Features**:
-- Markdown to Google Docs conversion
-- Support for headers, bold, italic, lists
-- Appends to existing documents
-- Automatic formatting with document styles
-
-**Usage**:
-```sql
-CALL SNOWFLAKE_INTELLIGENCE.TOOLS.EXPORT_TO_GOOGLE_DOCS(
-    '# Report Title
-
-    ## Section 1
-    This is **bold** and this is *italic*.
-    
-    - Bullet point 1
-    - Bullet point 2',
-    'YOUR_GOOGLE_DOC_ID'  -- Optional, uses default if not provided
-);
-```
-
-## 📊 Google Sheets Integration
-
-### Sheets Export
-**File**: `google/sheets/sheets_export.sql`
-
-Export JSON data from Snowflake Intelligence to Google Sheets with automatic formatting.
-
-**Features**:
-- Dynamic JSON data handling
-- Automatic header detection
-- Timestamped tabs for data history
-- Example formatting (blue headers, auto-resize)
-
-**Usage**:
-```sql
--- Export array of objects
-CALL SNOWFLAKE_INTELLIGENCE.TOOLS.EXPORT_TO_GOOGLE_SHEETS(
-    '[
-      {"date": "2025-01-15", "product": "Widget A", "quantity": 25, "revenue": 749.75},
-      {"date": "2025-01-16", "product": "Widget B", "quantity": 18, "revenue": 899.82}
-    ]',
-    'Sales Report'
-);
-
--- Export array of arrays
-CALL SNOWFLAKE_INTELLIGENCE.TOOLS.EXPORT_TO_GOOGLE_SHEETS(
-    '[
-      ["Date", "Product", "Quantity", "Revenue"],
-      ["2025-01-15", "Widget A", 25, 749.75],
-      ["2025-01-16", "Widget B", 18, 899.82]
-    ]',
-    'Sales Data'
-);
-```
+- **ddl_manager.sql**: Data Definition Language management
+- **dml_manager.sql**: Data Manipulation Language operations
 
 ## 🚀 Quick Start
 
-### 1. Email Setup
-```sql
--- Run email/email_sender.sql first, then:
-CALL SNOWFLAKE_INTELLIGENCE.TOOLS.SEND_EMAIL(
-    'your.email@company.com',
-    'Test Email',
-    'This is a test from Snowflake Intelligence!'
-);
-```
-
-### 2. Google Docs Setup
-```sql
--- 1. Create a Google Doc and share with service account
--- 2. Update GOOGLE_DOCS_SERVICE_ACCOUNT secret
--- 3. Run google/docs/docs_export.sql
--- 4. Test:
-CALL SNOWFLAKE_INTELLIGENCE.TOOLS.EXPORT_TO_GOOGLE_DOCS(
-    '# Test Document\n\nThis is a **test** export.',
-    'YOUR_DOC_ID'
-);
-```
-
-### 3. Google Sheets Setup
-```sql
--- 1. Create a Google Sheet and share with service account
--- 2. Update GOOGLE_SHEETS_SERVICE_ACCOUNT secret
--- 3. Update spreadsheet_id in procedure
--- 4. Run google/sheets/sheets_export.sql
--- 5. Test:
-CALL SNOWFLAKE_INTELLIGENCE.TOOLS.EXPORT_TO_GOOGLE_SHEETS(
-    '[{"test": "data", "value": 123}]',
-    'Test Export'
-);
-```
+1. **Run the foundation setup** with `snowflake_intelligence/setup.sql`
+2. **Choose the tools you need** from the directories above
+3. **Run tool-specific setup scripts** (if applicable) with ACCOUNTADMIN role
+4. **Configure credentials** and permissions as needed
+5. **Deploy procedures** with SYSADMIN role
+6. **Test the tools** with the provided examples
 
 ## 📋 Prerequisites
 
-### For Email Tools:
-- Snowflake account with ACCOUNTADMIN access
-- Pre-approved email recipients list
-- SYSADMIN role for procedure deployment
+### General Requirements
+- Snowflake account with appropriate roles (ACCOUNTADMIN for setup, SYSADMIN for deployment)
+- External access capabilities enabled in Snowflake
 
-### For Google Integrations:
-- Google Cloud Project
-- Service Account with JSON credentials
-- APIs enabled:
-  - Google Docs API (for Docs export)
-  - Google Sheets API (for Sheets export)
-- Documents/Sheets shared with service account (Editor permissions)
-- Snowflake external access configuration
+### Tool-Specific Requirements
 
-## 🔧 Troubleshooting
+**Email Tools**:
+- Notification integration configuration
+- Pre-approved recipient list
 
-### Email Not Sending
-- Verify recipient is in ALLOWED_RECIPIENTS list
-- Check notification integration is enabled
+**Google Workspace**:
+- Google Cloud Project with APIs enabled
+- Service Account credentials
+- Proper sharing permissions
 
-### Google API Errors
-- Verify service account has Editor permissions
-- Check API quotas (100 requests/100 seconds)
-- Ensure document/sheet ID is correct
+**GitHub Integration**:
+- GitHub Personal Access Token
+- Network rules for api.github.com
 
-### Performance Issues
-- Check Google API quotas
-- Consider batching operations
+**Database Management**:
+- Appropriate database permissions
+- Understanding of DDL/DML operations
 
-## 📞 Support
+## 🤝 Contributing
 
-For issues or questions:
-- Review the troubleshooting section
-- Consult Snowflake documentation
+Contributions are welcome! Please ensure:
+- Code follows existing patterns
+- Include documentation and examples
+- Test thoroughly before submitting
+- Follow security best practices
+
+## 📄 License
+
+See LICENSE file for details.
+
+## ⚠️ Disclaimer
+
+These tools are provided as examples and should be thoroughly tested and adapted for production use. Always follow your organization's security and compliance requirements.
